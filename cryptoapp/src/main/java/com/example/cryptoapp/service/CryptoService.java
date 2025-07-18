@@ -28,8 +28,8 @@ public class CryptoService {
         secretKey = new SecretKeySpec(key.getBytes(), ALGORITHM);
     }
 
-    public String encrypt(String message) throws Exception {
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
+public String encrypt(String message, String username) throws Exception {
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         byte[] encrypted = cipher.doFinal(message.getBytes());
         String result = Base64.getEncoder().encodeToString(encrypted);

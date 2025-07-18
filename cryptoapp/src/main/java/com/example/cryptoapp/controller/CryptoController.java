@@ -5,6 +5,8 @@ import com.example.cryptoapp.dto.*;
 import com.example.cryptoapp.service.CryptoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 
 @RestController
@@ -19,10 +21,11 @@ public class CryptoController {
     }
 
     @PostMapping("/encrypt")
-    public ResponseEntity<EncryptResponse> encrypt(@RequestBody EncryptRequest request) throws Exception {
-        String encrypted = cryptoService.encrypt(request.getMessage());
-        return ResponseEntity.ok(new EncryptResponse(encrypted));
-    }
+    public ResponseEntity<EncryptResponse> encrypt(@RequestBody EncryptRequest request,
+                                               @AuthenticationPrincipal UserDetails user) throws Exception {
+    String encrypted = cryptoService.encrypt(request.getMessage(), user.getUsername());
+    return ResponseEntity.ok(new EncryptResponse(encrypted));
+}
 
     @PostMapping("/decrypt")
     public ResponseEntity<String> decrypt(@RequestBody DecryptRequest request) throws Exception {

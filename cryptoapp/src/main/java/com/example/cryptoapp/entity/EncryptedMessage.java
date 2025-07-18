@@ -9,7 +9,8 @@ public class EncryptedMessage  {
     private Long id;
 
     private String encrypted;
-
+    @ManyToOne
+    private User user;
     public EncryptedMessage() {}
 
     public EncryptedMessage(String encrypted) {

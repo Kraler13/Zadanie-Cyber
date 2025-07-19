@@ -1,7 +1,9 @@
 package com.example.cryptoapp.service;
 
 import com.example.cryptoapp.entity.EncryptedMessage;
+import com.example.cryptoapp.entity.User;
 import com.example.cryptoapp.repository.EncryptedMessageRepository;
+import com.example.cryptoapp.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +16,11 @@ import java.util.List;
 public class CryptoService {
 
     private final EncryptedMessageRepository repository;
+    private final UserRepository userRepository;
 
-    public CryptoService(EncryptedMessageRepository repository) {
+    public CryptoService(EncryptedMessageRepository repository, UserRepository userRepository) {
         this.repository = repository;
+        this.userRepository = userRepository;
     }
 
     private static final String ALGORITHM = "AES";
@@ -28,12 +32,16 @@ public class CryptoService {
         secretKey = new SecretKeySpec(key.getBytes(), ALGORITHM);
     }
 
-public String encrypt(String message, String username) throws Exception {
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
+    public String encrypt(String message, String username) throws Exception {
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         byte[] encrypted = cipher.doFinal(message.getBytes());
         String result = Base64.getEncoder().encodeToString(encrypted);
-        repository.save(new EncryptedMessage(result));
+
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        repository.save(new EncryptedMessage(result, user));
         return result;
     }
 
@@ -47,5 +55,20 @@ public String encrypt(String message, String username) throws Exception {
 
     public List<EncryptedMessage> getAllEncryptedMessages() {
         return repository.findAll();
+    }
+
+    public List<EncryptedMessage> getMessagesForUser(String username) {
+        return repository.findAllByUserUsername(username);
+    }
+
+    public void deleteMessage(Long id, String username) {
+        EncryptedMessage message = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+
+        if (!message.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Not authorized to delete this message");
+        }
+
+        repository.delete(message);
     }
 }

@@ -22,10 +22,10 @@ public class CryptoController {
 
     @PostMapping("/encrypt")
     public ResponseEntity<EncryptResponse> encrypt(@RequestBody EncryptRequest request,
-                                               @AuthenticationPrincipal UserDetails user) throws Exception {
-    String encrypted = cryptoService.encrypt(request.getMessage(), user.getUsername());
-    return ResponseEntity.ok(new EncryptResponse(encrypted));
-}
+            @AuthenticationPrincipal UserDetails user) throws Exception {
+        String encrypted = cryptoService.encrypt(request.getMessage(), user.getUsername());
+        return ResponseEntity.ok(new EncryptResponse(encrypted));
+    }
 
     @PostMapping("/decrypt")
     public ResponseEntity<String> decrypt(@RequestBody DecryptRequest request) throws Exception {
@@ -33,8 +33,21 @@ public class CryptoController {
         return ResponseEntity.ok(decrypted);
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<List<EncryptedMessage>> getMyEncryptedMessages(@AuthenticationPrincipal UserDetails user) {
+        return ResponseEntity.ok(cryptoService.getMessagesForUser(user.getUsername()));
+    }
+
     @GetMapping("/all")
-    public ResponseEntity<List<EncryptedMessage>> getAllEncryptedMessages() {
-    return ResponseEntity.ok(cryptoService.getAllEncryptedMessages());
-}
+    public ResponseEntity<List<EncryptedMessage>> getMessagesForUser(
+            @AuthenticationPrincipal UserDetails user) {
+        return ResponseEntity.ok(cryptoService.getMessagesForUser(user.getUsername()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id, @AuthenticationPrincipal UserDetails user) {
+        cryptoService.deleteMessage(id, user.getUsername());
+        return ResponseEntity.ok().build();
+    }
+
 }

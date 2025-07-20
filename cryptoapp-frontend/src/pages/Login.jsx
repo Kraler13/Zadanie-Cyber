@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function Login() {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -23,13 +23,19 @@ function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Logowanie</h2>
-      <input name="username" value={form.username} onChange={handleChange} placeholder="Nazwa użytkownika" />
-      <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Hasło" />
-      <button type="submit">Zaloguj</button>
-      <p>Nie masz konta? <Link to="/register">Zarejestruj się</Link></p>
-    </form>
+    <div className="container mt-5">
+      <h2 className="mb-4">Logowanie</h2>
+      <form onSubmit={handleSubmit} className="w-100" style={{ maxWidth: "400px" }}>
+        <div className="mb-3">
+          <input className="form-control" name="username" value={form.username} onChange={handleChange} placeholder="Nazwa użytkownika" />
+        </div>
+        <div className="mb-3">
+          <input className="form-control" name="password" type="password" value={form.password} onChange={handleChange} placeholder="Hasło" />
+        </div>
+        <button className="btn btn-primary w-100" type="submit">Zaloguj</button>
+        <p className="mt-3 text-center">Nie masz konta? <Link to="/register">Zarejestruj się</Link></p>
+      </form>
+    </div>
   );
 }
 

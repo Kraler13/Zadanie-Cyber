@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function Home() {
   const [messages, setMessages] = useState([]);
@@ -56,7 +57,7 @@ function Home() {
       await axiosInstance.delete(`/crypto/${id}`);
       fetchMessages();
     } catch (err) {
-      alert("Nie udało się usunąć wiadomości.");
+      alert("Błąd przy usuwaniu wiadomości.");
     }
   };
 
@@ -66,53 +67,41 @@ function Home() {
   };
 
   return (
-    <div className="container py-5">
-      <div className="d-flex justify-content-between mb-4">
+    <div className="container mt-5">
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Witaj!</h2>
-        <button className="btn btn-outline-danger" onClick={handleLogout}>
-          Wyloguj
-        </button>
+        <button className="btn btn-outline-danger" onClick={handleLogout}>Wyloguj</button>
       </div>
 
-      <div className="input-group mb-3">
+      <div className="mb-4">
         <input
-          className="form-control"
+          className="form-control mb-2"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Wpisz wiadomość do zaszyfrowania"
         />
-        <button className="btn btn-primary" onClick={handleEncrypt}>
-          Zaszyfruj
-        </button>
+        <button className="btn btn-primary w-100" onClick={handleEncrypt}>Zaszyfruj</button>
       </div>
 
-      <h4 className="mb-3">Twoje wiadomości:</h4>
-      <div className="row">
+      <h4>Twoje wiadomości:</h4>
+      <ul className="list-group">
         {messages.map((msg) => (
-          <div key={msg.id} className="col-md-6 mb-3">
-            <div className="card p-3">
-              <p><strong>Zaszyfrowana:</strong> {msg.encrypted}</p>
-              {decrypted[msg.id] && (
-                <p><strong>Odszyfrowana:</strong> {decrypted[msg.id]}</p>
-              )}
-              <div className="d-flex gap-2">
-                <button
-                  className="btn btn-sm btn-success"
-                  onClick={() => handleDecrypt(msg.id, msg.encrypted)}
-                >
-                  Odszyfruj
-                </button>
-                <button
-                  className="btn btn-sm btn-danger"
-                  onClick={() => handleDelete(msg.id)}
-                >
-                  Usuń
-                </button>
-              </div>
+          <li key={msg.id} className="list-group-item">
+            <p><strong>Zaszyfrowana:</strong> {msg.encrypted}</p>
+            <div className="d-flex gap-2">
+              <button className="btn btn-sm btn-secondary" onClick={() => handleDecrypt(msg.id, msg.encrypted)}>
+                Odszyfruj
+              </button>
+              <button className="btn btn-sm btn-danger" onClick={() => handleDelete(msg.id)}>
+                Usuń
+              </button>
             </div>
-          </div>
+            {decrypted[msg.id] && (
+              <p className="mt-2"><strong>Odszyfrowana:</strong> {decrypted[msg.id]}</p>
+            )}
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

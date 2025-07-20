@@ -3,7 +3,11 @@ package com.example.cryptoapp.controller;
 import com.example.cryptoapp.entity.EncryptedMessage;
 import com.example.cryptoapp.dto.*;
 import com.example.cryptoapp.service.CryptoService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +25,7 @@ public class CryptoController {
     }
 
     @PostMapping("/encrypt")
-    public ResponseEntity<EncryptResponse> encrypt(@RequestBody EncryptRequest request,
+    public ResponseEntity<EncryptResponse> encrypt(@Valid @RequestBody EncryptRequest request,
             @AuthenticationPrincipal UserDetails user) throws Exception {
         String encrypted = cryptoService.encrypt(request.getMessage(), user.getUsername());
         return ResponseEntity.ok(new EncryptResponse(encrypted));

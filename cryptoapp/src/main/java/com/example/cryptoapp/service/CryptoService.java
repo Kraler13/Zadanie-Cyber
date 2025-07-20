@@ -11,6 +11,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.List;
+import org.owasp.encoder.Encode;
 
 @Service
 public class CryptoService {
@@ -33,18 +34,19 @@ public class CryptoService {
     }
 
     public String encrypt(String message, String username) throws Exception {
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        byte[] encrypted = cipher.doFinal(message.getBytes());
-        String result = Base64.getEncoder().encodeToString(encrypted);
+    String sanitized = Encode.forHtmlContent(message);
 
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+    Cipher cipher = Cipher.getInstance(ALGORITHM);
+    cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+    byte[] encrypted = cipher.doFinal(sanitized.getBytes());
+    String result = Base64.getEncoder().encodeToString(encrypted);
 
-        repository.save(new EncryptedMessage(result, user));
-        return result;
-    }
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new RuntimeException("User not found"));
 
+    repository.save(new EncryptedMessage(result, user));
+    return result;
+}
     public String decrypt(String encryptedMessage) throws Exception {
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
